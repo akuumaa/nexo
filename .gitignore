@@ -1,3 +1,44 @@
+# Binaries
+/bin/
+/build/
+/dist/
+/tmp/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+
+# Go workspace
+go.work
+go.work.sum
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# IDE
 .idea/
 .vscode/
-.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local data / uploads
+/data/
+/uploads/
+
+# Optional local database files
+*.db
+*.sqlite
+*.sqlite3

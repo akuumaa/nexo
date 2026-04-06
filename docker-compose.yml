@@ -9,9 +9,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
-    volumes:
-      - ./:/app
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   db:
@@ -26,6 +25,11 @@ services:
     volumes:
       - nexo_postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexo -d nexo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   nexo_postgres_data:

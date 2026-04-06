@@ -4,32 +4,27 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+
+	"github.com/akuumaa/nexo/internal/config"
+	"github.com/akuumaa/nexo/internal/db"
+	"github.com/akuumaa/nexo/internal/http/router"
 )
 
 func main() {
-	host := getEnv("APP_HOST", "0.0.0.0")
-	port := getEnv("APP_PORT", "8080")
+	cfg := config.Load()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"service":"nexo","status":"ok"}`))
-	})
+	database, err := db.NewPostgres(cfg)
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+	defer database.Close()
 
-	addr := fmt.Sprintf("%s:%s", host, port)
-	log.Printf("starting nexo on %s", addr)
+	r := router.New(database)
 
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	addr := fmt.Sprintf("%s:%s", cfg.AppHost, cfg.AppPort)
+	log.Printf("starting nexo in %s on %s", cfg.AppEnv, addr)
+
+	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func getEnv(key, fallback string) string {
-	val := os.Getenv(key)
-	if val == "" {
-		return fallback
-	}
-	return val
 }
