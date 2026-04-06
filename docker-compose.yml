@@ -1,0 +1,31 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexo-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: nexo-db
+    environment:
+      POSTGRES_DB: nexo
+      POSTGRES_USER: nexo
+      POSTGRES_PASSWORD: nexo
+    ports:
+      - "5432:5432"
+    volumes:
+      - nexo_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  nexo_postgres_data:
